@@ -21,7 +21,7 @@ defmodule Cashier.Gateways.PayPalTest do
 
     {:ok, config: config, bypass: bypass}
   end
-  
+
   test "init/1 should put the PayPal access_token into state", %{config: config, bypass: bypass} do
     Bypass.expect bypass, fn conn ->
       {:ok, body, _} = Plug.Conn.read_body(conn)
@@ -31,7 +31,7 @@ defmodule Cashier.Gateways.PayPalTest do
       assert has_header(conn, {"authorization", "Basic Y2xpZW50X2lkOmNsaWVudF9zZWNyZXQ="})
       assert has_header(conn, {"content-type", "application/x-www-form-urlencoded"})
       assert body == "grant_type=client_credentials"
-      
+
       Plug.Conn.send_resp(conn, 200, "{\"access_token\": \"some_token\"}")
     end
 
@@ -84,9 +84,9 @@ defmodule Cashier.Gateways.PayPalTest do
       Plug.Conn.send_resp(conn, 201, expected_response)
     end
 
-    opts = default_opts ++ [billing_address: address]
+    opts = default_opts() ++ [billing_address: address()]
 
-    {:ok, id, {:paypal, response}} = Gateway.authorize(9.75, payment_card, opts, config)
+    {:ok, id, {:paypal, response}} = Gateway.authorize(9.75, payment_card(), opts, config)
 
     assert id == "PAY-123"
     assert response == expected_response
@@ -107,8 +107,8 @@ defmodule Cashier.Gateways.PayPalTest do
       Plug.Conn.send_resp(conn, 201, expected_response)
     end
 
-    opts = default_opts ++ [
-      billing_address: address,
+    opts = default_opts() ++ [
+      billing_address: address(),
       external_customer_id: "CUST-1"
     ]
 
@@ -133,7 +133,7 @@ defmodule Cashier.Gateways.PayPalTest do
       Plug.Conn.send_resp(conn, 200, expected_response)
     end
 
-    {:ok, id, {:paypal, response}} = Gateway.capture("1234", 9.75, default_opts, config)
+    {:ok, id, {:paypal, response}} = Gateway.capture("1234", 9.75, default_opts(), config)
 
     assert id == "5678"
     assert response == expected_response
@@ -154,7 +154,7 @@ defmodule Cashier.Gateways.PayPalTest do
       Plug.Conn.send_resp(conn, 200, expected_response)
     end
 
-    opts = [final_capture: true] ++ default_opts
+    opts = [final_capture: true] ++ default_opts()
 
     {:ok, id, {:paypal, response}} = Gateway.capture("1234", 9.75, opts, config)
 
@@ -177,9 +177,9 @@ defmodule Cashier.Gateways.PayPalTest do
       Plug.Conn.send_resp(conn, 201, expected_response)
     end
 
-    opts = default_opts ++ [billing_address: address]
+    opts = default_opts() ++ [billing_address: address()]
 
-    {:ok, id, {:paypal, response}} = Gateway.purchase(9.75, payment_card, opts, config)
+    {:ok, id, {:paypal, response}} = Gateway.purchase(9.75, payment_card(), opts, config)
 
     assert id == "PAY-123"
     assert response == expected_response
@@ -200,8 +200,8 @@ defmodule Cashier.Gateways.PayPalTest do
       Plug.Conn.send_resp(conn, 201, expected_response)
     end
 
-    opts = default_opts ++ [
-      billing_address: address,
+    opts = default_opts() ++ [
+      billing_address: address(),
       external_customer_id: "CUST-1"
     ]
 
@@ -226,7 +226,7 @@ defmodule Cashier.Gateways.PayPalTest do
       Plug.Conn.send_resp(conn, 200, expected_response)
     end
 
-    opts = default_opts
+    opts = default_opts()
 
     {:ok, id, {:paypal, response}} = Gateway.refund("1234", opts, config)
 
@@ -249,7 +249,7 @@ defmodule Cashier.Gateways.PayPalTest do
       Plug.Conn.send_resp(conn, 200, expected_response)
     end
 
-    opts = [amount: 9.75] ++ default_opts
+    opts = [amount: 9.75] ++ default_opts()
 
     {:ok, id, {:paypal, response}} = Gateway.refund("1234", opts, config)
 
@@ -272,12 +272,12 @@ defmodule Cashier.Gateways.PayPalTest do
       Plug.Conn.send_resp(conn, 201, expected_response)
     end
 
-    opts = default_opts ++ [
-      billing_address: address,
+    opts = default_opts() ++ [
+      billing_address: address(),
       external_customer_id: "CUST-1"
     ]
 
-    {:ok, id, {:paypal, response}} = Gateway.store(payment_card, opts, config)
+    {:ok, id, {:paypal, response}} = Gateway.store(payment_card(), opts, config)
 
     assert id == "CARD-123"
     assert response == expected_response
